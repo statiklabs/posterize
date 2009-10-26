@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: Posterize
-Plugin URI: http://yansarazin.com/plugins/posterize
+Plugin URI: http://statikpulse.com/plugins/posterize
 Description: This plugin will automatically send an email to Posterous that will link to your post. 
 Version: 1.0.1
-Author: Yan Sarazin
-Author URI: http://yansarazin.com
+Author: Yan Sarazin 
+Author URI: http://statikpulse.com
 */
 
 /*  Copyright 2008  Yan Sarazin  (email : yan.sarazin@gmail.com)
