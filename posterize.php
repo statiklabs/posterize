@@ -44,8 +44,18 @@ function deactivatePosterize() {
 if(is_admin()){
    
    add_action('admin_menu', 'posterizeAdminMenu');
+   add_filter('plugin_row_meta', 'posterizePluginLinks',10,2);
    function posterizeAdminMenu(){
       add_options_page('Posterize Settings', 'Posterize', 'administrator', 'posterize-settings', 'posterizeAdminPage');
+   }
+   
+   function posterizePluginLinks($links, $file){
+      if( $file == 'posterize/posterize.php') {
+         $links[] = '<a href="' . admin_url( 'options-general.php?page=posterize-settings' ) . '">' . __('Settings') . '</a>';
+         $links[] = '<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QC745TKR6AHBS" target="_blank">Donate</a>';
+      }
+      return $links;
+      
    }
 
    function posterizeAdminPage(){
