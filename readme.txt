@@ -1,15 +1,15 @@
 === Posterize ===
 Contributors: Yan Sarazin
 Tags: posterous, email, posts
-Requires at least: 2.5
-Tested up to: 2.8.5
-Stable tag: 1.0.1
+Requires at least: 2.8.6
+Tested up to: 2.9.1
+Stable tag: 2.0
 
 WordPress to Posterous plugin.
 
 == Description ==
 
-Posterize will send an email to posterous@posterous.com using the logged-in user’s email address. The post’s title will be in the subject and the body will be a link back to your WordPress post.
+Posterize will cross-post your Wordpress blog post to a Posterous site. You can choose whether to link back your Wordpress blog post or cross-post the full content. Also allows you to select which Posterous site to post to.
 
 
 == Installation ==
@@ -17,3 +17,4 @@ Posterize will send an email to posterous@posterous.com using the logged-in user
 1. If you are upgrading, it is recommended that you deactivate the plugin from the Plugins page, and delete the posterize folder from your server.
 2. Upload the unzipped contents to your /wp-content/plugins/ directory.
 3. Active the plugin from the Plugins page.
+4. Go to settings page to configure Posterize

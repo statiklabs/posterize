@@ -1,0 +1,13 @@
+table.sites_table {
+   background-color: #CCC;
+   margin-top: 5px;
+   width: 400px;
+}
+table.sites_table td, table.sites_table th {
+   background-color: #F9F9F9;
+   padding: 2px 5px;
+}
+
+.sites_table th {
+   text-align: left;
+}

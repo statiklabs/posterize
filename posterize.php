@@ -3,7 +3,7 @@
 Plugin Name: Posterize
 Plugin URI: http://statikpulse.com/posterize
 Description: This plugin will automatically cross-post your Wordpress blog entry to your Posterous site. 
-Version: 2.0Beta1
+Version: 2.0
 Author: Yan Sarazin 
 Author URI: http://statikpulse.com
 */
@@ -24,6 +24,7 @@ Author URI: http://statikpulse.com
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
 
 /* When plugin is activated */
 register_activation_hook(__FILE__,'activatePosterize');
@@ -60,12 +61,19 @@ if(is_admin()){
 
    function posterizeAdminPage(){
       ?>
-      <form method="post" action="options.php">      
+      <script type="text/javascript" charset="utf-8" src="<?php echo WP_PLUGIN_URL;?>/posterize/js/jquery-1.4.min.js"></script>
+      <script type="text/javascript" charset="utf-8">
+         var plugin_url = '<?php echo WP_PLUGIN_URL;?>/posterize/';
+      </script>
+      <script type="text/javascript" charset="utf-8" src="<?php echo WP_PLUGIN_URL;?>/posterize/js/posterize.js"></script>
+      <link rel="stylesheet" href="<?php echo WP_PLUGIN_URL;?>/posterize/css/styles.css" type="text/css" media="screen" title="no title" charset="utf-8" />
+      
+      <form method="post" action="options.php" id="posterize_settings_form" name="posterize_settings_form">      
       <?php wp_nonce_field('update-options'); ?>
       <h1>Posterize Settings</h1>
       <table>
          <tr>
-            <td colspan="2"><h3>Pousterous Login Information</h3></td>
+            <td colspan="2"><h3>Posterous Login Information</h3></td>
          </tr>
          <tr>
             <td width="100"><label for="posterous_email">Email:</label></td>
@@ -75,6 +83,15 @@ if(is_admin()){
             <td><label for="posterous_password">Password:</label></td>
             <td><input name="posterous_password" type="password" id="posterous_password" value="<?php echo get_option('posterous_password'); ?>" /></td>
          </tr>
+         <tr>
+            <td colspan="2"><h3>Posterous Site</h3></td>
+         </tr>
+         <tr>
+            <td width="100"><label for="posterous_site">Site ID:</label></td>
+            <td><input name="posterous_site" type="text" id="posterous_site" value="<?php echo get_option('posterous_site'); ?>" /> <a href="#" onClick="Posterize.get_sites();">Get Sites</a></td>
+         </tr>    
+         <tr>
+            <td colspan="2" id="sites" style="display: none;"></td>  
          <tr>
             <td colspan="2"><h3>What to post</h3></td>
          </tr>
@@ -89,7 +106,7 @@ if(is_admin()){
          <tr>
             <td colspan="2">
                <input type="hidden" name="action" value="update" />
-               <input type="hidden" name="page_options" value="posterous_email,posterous_password,post_type" />
+               <input type="hidden" name="page_options" value="posterous_email,posterous_password,post_type,posterous_site" />
                <input type="submit" value="<?php _e('Save Changes') ?>" />
             </td>
          </tr>
@@ -125,7 +142,7 @@ function email_posterous($post_ID)  {
 
 
       $ch = curl_init(); 
-      curl_setopt($ch, CURLOPT_URL, 'http://posterous.com/api/newpost?title='.$title.'&body='.$body); 
+      curl_setopt($ch, CURLOPT_URL, 'http://posterous.com/api/newpost?site_id='.get_option('posterous_site').'&title='.$title.'&body='.$body); 
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
       curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC); 
       curl_setopt($ch, CURLOPT_USERPWD, "".get_option('posterous_email').":".get_option('posterous_password')."") ;
