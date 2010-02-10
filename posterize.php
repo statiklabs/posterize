@@ -102,8 +102,6 @@ if(is_admin()){
             <td colspan="2"><input type="radio" id="post_type" name="post_type" value="2" <?php if(get_option('post_type')=="2"){ echo "checked='checked'";} ?>> Post full content</td>
          </tr>
          <tr>
-            <td colspan="2"><h4>Note: Currently Posterize only supports adding content to your main Posterous site.</h4></td>
-         <tr>
             <td colspan="2">
                <input type="hidden" name="action" value="update" />
                <input type="hidden" name="page_options" value="posterous_email,posterous_password,post_type,posterous_site" />
