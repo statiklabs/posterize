@@ -3,7 +3,7 @@ Contributors: Yan Sarazin
 Tags: posterous, email, posts
 Requires at least: 2.8.6
 Tested up to: 2.9.1
-Stable tag: 2.0
+Stable tag: 2.0.1
 
 WordPress to Posterous plugin.
 
