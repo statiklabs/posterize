@@ -3,7 +3,7 @@
 Plugin Name: Posterize
 Plugin URI: http://statikpulse.com/posterize
 Description: This plugin will automatically cross-post your Wordpress blog entry to your Posterous site. 
-Version: 2.0
+Version: 2.0.1
 Author: Yan Sarazin 
 Author URI: http://statikpulse.com
 */
