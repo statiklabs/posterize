@@ -18,24 +18,35 @@ $sites = array();
 
 if(!$data['site']){
    print '<div class="error"><strong>Error:</strong> Check your username and password</div>';
-}else{   
-
-   foreach ($data['site'] as $keys => $values) {
-      
-       foreach ($values as $key => $value) {
-                  $value = str_replace("\r\n", '<br />', $value);
-                  $value = str_replace("\r", '<br />', $value);
-                  $value = str_replace("\n", '<br />', $value);
-                  $sites['site'][$keys][$key] = $value;
-              }
-    
-   }
+}else{ 
    $html = '<table border="0" cellspacing="1" cellpadding="5" class="sites_table"><tr><th>site id</th><th>Site Name</th></tr>';
-   foreach($sites['site'] as $site){
+   
+   if(is_array($data['site'])){
+
+      foreach ($data['site'] as $keys => $values) {
+      
+          foreach ($values as $key => $value) {
+                     $value = str_replace("\r\n", '<br />', $value);
+                     $value = str_replace("\r", '<br />', $value);
+                     $value = str_replace("\n", '<br />', $value);
+                     $sites['site'][$keys][$key] = $value;
+                 }
+      }
+      foreach($sites['site'] as $site){
+         $html .= '<tr><td>'.$site['id'].'</td><td><a href="'.$site['url'].'" target="blank">'.$site['name'].'</a></td></tr>';
+      }
+   }else{
+      foreach ($data['site'] as $key => $value) {
+                 $value = str_replace("\r\n", '<br />', $value);
+                 $value = str_replace("\r", '<br />', $value);
+                 $value = str_replace("\n", '<br />', $value);
+                 $site[$key] = $value;
+             }    
       $html .= '<tr><td>'.$site['id'].'</td><td><a href="'.$site['url'].'" target="blank">'.$site['name'].'</a></td></tr>';
    }
-   $html .= '</table>';
+  $html .= '</table>';
    print $html;
 }
+
 
 ?>
