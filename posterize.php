@@ -3,7 +3,7 @@
 Plugin Name: Posterize
 Plugin URI: http://statikpulse.com/posterize
 Description: This plugin will automatically cross-post your Wordpress blog entry to your Posterous site. 
-Version: 2.0.2
+Version: 2.1.0
 Author: Yan Sarazin 
 Author URI: http://statikpulse.com
 */
@@ -125,22 +125,31 @@ function posterous_password(){
 }
 
 
-function email_posterous($post_ID)  {
+function send_to_posterous($post_ID)  {
    if(get_option('posterous_email')!='' && get_option('posterous_password')!=''){
       global $userdata;
       get_currentuserinfo();
 
       $post = get_post($post_ID);
       $title = urlencode($post->post_title);
+	  $tags = array();
+	  $posttags = get_the_tags($post_ID);
+	  if ($posttags) {
+		foreach($posttags as $tag) {
+			$tags[] = $tag->name; 
+		}
+	  }
       if(get_option('post_type')=="2"){
          $body = urlencode($post->post_content);
       }else{
          $body = urlencode('<a href="'.get_permalink($post_ID).'">'.$post->post_title.'</a>');
       }
+	  $source = urlencode('Posterize');
+	  $sourceLink = urlencode('http://statikpulse.com/posterize');
 
 
       $ch = curl_init(); 
-      curl_setopt($ch, CURLOPT_URL, 'http://posterous.com/api/newpost?site_id='.get_option('posterous_site').'&title='.$title.'&body='.$body); 
+      curl_setopt($ch, CURLOPT_URL, 'http://posterous.com/api/newpost?source='.$source.'&sourceLink='.$sourceLink.'&site_id='.get_option('posterous_site').'&title='.$title.'&body='.$body.'&tags='.implode(',', $tags)); 
       curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
       curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC); 
       curl_setopt($ch, CURLOPT_USERPWD, "".get_option('posterous_email').":".get_option('posterous_password')."") ;
@@ -150,6 +159,6 @@ function email_posterous($post_ID)  {
    }
 }
 
-add_action('draft_to_publish', 'email_posterous');
-add_action('pending_to_publish', 'email_posterous');
+add_action('draft_to_publish', 'send_to_posterous');
+add_action('pending_to_publish', 'send_to_posterous');
 ?>
