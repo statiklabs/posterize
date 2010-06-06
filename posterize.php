@@ -140,7 +140,7 @@ function send_to_posterous($post_ID)  {
 		}
 	  }
       if(get_option('post_type')=="2"){
-         $body = urlencode($post->post_content);
+         $body = urlencode(nl2br($post->post_content));
       }else{
          $body = urlencode('<a href="'.get_permalink($post_ID).'">'.$post->post_title.'</a>');
       }
