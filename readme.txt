@@ -3,7 +3,7 @@ Contributors: Yan Sarazin
 Tags: posterous, email, posts
 Requires at least: 2.8.6
 Tested up to: 2.9.2
-Stable tag: 2.1.0
+Stable tag: 2.1.1
 
 WordPress to Posterous plugin.
 
@@ -26,6 +26,9 @@ Posterize will cross-post your Wordpress blog post to a Posterous site. You can 
 3. Chose "Link back to post" or "Post full content"
 
 == Changelog ==
+
+= 2.1.1 =
+* Fixed missing line break issues.
 
 = 2.1.0 =
 * Including WordPress post tags if available
