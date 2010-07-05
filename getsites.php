@@ -45,7 +45,7 @@ if(!$data['site']){
       $html .= '<tr><td>'.$site['id'].'</td><td><a href="'.$site['url'].'" target="blank">'.$site['name'].'</a></td></tr>';
    }
   $html .= '</table>';
-   print $html;
+   echo $html;
 }
 
 

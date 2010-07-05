@@ -15,29 +15,49 @@
   margin: 0;
 }
 
-.section > p {
-  padding: 5px 20px;
-  position: relative;
+.section > h2 > a {
+  font-size: 0.6em;
 }
 
-.section > p > label {
-  font-weight: bold;
+.section > div {
+  padding: 15px 20px;
+
 }
 
-.section > p .text-field {
-  font-size: 1.2em;
-  padding: 5px;
-  width: 275px;
+div.fl {
+  float: left;
 }
 
-.section > p > span {
-  position: absolute;
-  background: #F1F1F1;
-  right: 20px;
-  top: 10px;
+div.fr {
+  float: right;
+}
+
+div.desc {
+  background: #F6F6F6;
   padding: 10px;
   width: 350px;
   -webkit-border-radius: 6px;
   -moz-border-radius: 6px;
   border-radius: 6px;
+}
+
+div.desc > ol {
+  margin-top: 5px;
+}
+div.desc > ol li {
+  margin: 0 0 0 10px;
+  color: #666;
+}
+div.clear {
+  clear: both;
+}
+
+.section label {
+  font-weight: bold;
+}
+
+.section .text-field {
+  font-size: 1.2em;
+  padding: 5px;
+  width: 275px;
 }

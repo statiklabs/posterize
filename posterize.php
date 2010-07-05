@@ -28,7 +28,13 @@ Author URI: http://statikpulse.com
 class Posterize {
 
 	function __construct() {
-	  register_activation_hook(__FILE__, array(&$this, 'install'));		
+      $this->options = get_option('posterize');
+      (!is_array($this->options) && !empty($this->options)) ? $this->options = unserialize($this->options) : $this->options = false;
+
+      register_activation_hook(__FILE__, array(&$this, 'install'));	
+      
+      add_action('draft_to_publish', array(&$this, 'send'));
+      add_action('pending_to_publish', array(&$this, 'send'));	
     
     if(is_admin()){
       wp_enqueue_style('style', WP_PLUGIN_URL . '/posterize/css/styles.css');
@@ -36,6 +42,8 @@ class Posterize {
   		wp_enqueue_script('javascript', WP_PLUGIN_URL . '/posterize/js/posterize.js');
       add_action('admin_menu', array(&$this, 'adminMenu'));
       add_filter('plugin_row_meta', array(&$this, 'links'),10,2);
+      add_action( 'wp_ajax_get_sites', array(&$this, 'getSites' ));
+		
     }
   }
   
@@ -92,32 +100,109 @@ class Posterize {
         <h1>Posterize Settings</h1>
         <div class="section">
           <h2>Posterous Login Info</h2>
-          <p>
-            <label for="email">Posterous Email</label><br />
-            <input type="text" name="email" id="email" value="<?php echo $this->options['email']; ?>" class="text-field" tabindex="1">
-            <span>The email address you use when login into the <a href="https://posterous.com/main/login">Posterous site</a> .</span>
-          </p>
-          <p>
-            <label for="password">Posterous Password</label><br />
-            <input type="password" name="password" id="password" value="<?php echo $this->options['password'] ?>" class="text-field" tabindex="2">
-            <span>The password you use when login into the <a href="https://posterous.com/main/login">Posterous site</a>.</span>
-          </p>
+          <div>
+             <div class="fl">
+               <label for="email">Posterous Email</label><br />
+               <input type="text" name="email" id="email" value="<?php echo $this->options['email']; ?>" class="text-field" tabindex="1">
+            </div>
+            <div class="fr desc">The email address you use when login into the <a href="https://posterous.com/main/login">Posterous site</a> .</div>
+            <div class="clear"></div>
+          </div>
+          <div>
+             <div class="fl">
+               <label for="password">Posterous Password</label><br />
+               <input type="password" name="password" id="password" value="<?php echo $this->options['password'] ?>" class="text-field" tabindex="2">
+            </div>
+            <div class="fr desc">The password you use when login into the <a href="https://posterous.com/main/login">Posterous site</a>.</div>
+            <div class="clear"></div>
+          </div>
         </div>
-        
+        <div class="section">
+          <h2>Posterous Site Info <a href="/wp-admin/admin-ajax.php?action=get_sites" class="get-sites-link">Refresh Site List</a></h2>
+          <div class="site-info">
+             <?php if(!is_array($this->options['sites']) && !empty($this->options['sites'])){?>
+             <?php }else{ ?>
+                <h4> <a href="/wp-admin/admin-ajax.php?action=get_sites" class="get-sites-link">Click here</a> to see list of your Posterous Sites.</h4>
+            <?php }?>
+          </div>
+        </div>        
         <div class="section">
           <h2>Extras</h2>
-          <p>
-            <label for="post_type">Post Type</label><br />
-            <input type="radio" name="post_type" id="post_type" value="1" tabindex="3" <?php if($this->options['post_type'] == "1") { ?>selected="selected"<?php }?>> Link back to post<br />
-            <input type="radio" name="post_type" id="post_type" value="2" tabindex="4" <?php if($this->options['post_type'] == "2") { ?>selected="selected"<?php }?>> Post Full Content<br />
-            <span>Select if you would rather post the full blog content or a link back to your post.</span>
-          </p>
+          <div>
+             <div class="fl">
+               <label for="post_type">Post Type</label><br />
+               <input type="radio" name="post_type" id="post_type" value="1" tabindex="3" <?php if($this->options['post_type'] == "1") { ?>checked="true"<?php }?>> 1. Link Back to Post<br />
+               <input type="radio" name="post_type" id="post_type" value="2" tabindex="4" <?php if($this->options['post_type'] == "2") { ?>checked="true"<?php }?>> 2. Post Full Content<br />
+            </div>
+            <div class="fr desc">How you want the content to be posted on your Posterous site.
+               <ol>
+                  <li>A link back to your blog post.</li>
+                  <li>The full content will be posted.</li>
+               </ol>
+            </div>
+            <div class="clear"></div>
+          </div>
         </div>
         <input type="submit" value="<?php _e('Save Settings') ?>" tabindex="5" />
       </form>
     <?php
   }
+  
+  function getSites() {
+     global $userdata;
 
+     $ch = curl_init(); 
+     curl_setopt($ch, CURLOPT_URL, 'http://posterous.com/api/getsites'); 
+     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+     curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC); 
+     curl_setopt($ch, CURLOPT_USERPWD, "".$_POST['email'].":".$_POST['password']."") ;
+
+     $xml = curl_exec($ch); 
+     curl_close($ch);
+
+     $xml = simplexml_load_string($xml);
+     $data = get_object_vars($root);
+
+     $sites = array();
+
+
+     echo var_dump($xml);;
+     die();
+  }
+  
+  function send() {
+     if($this->options['email']!='' && $this->options['password']){
+        global $userdata;
+        get_currentuserinfo();
+
+        $post = get_post($post_ID);
+        $title = urlencode($post->post_title);
+   	  $tags = array();
+   	  $posttags = get_the_tags($post_ID);
+   	  if ($posttags) {
+   		foreach($posttags as $tag) {
+   			$tags[] = $tag->name; 
+   		}
+   	  }
+        if($this->options['post_type']=="2"){
+           $body = urlencode(nl2br($post->post_content));
+        }else{
+           $body = urlencode('<a href="'.get_permalink($post_ID).'">'.$post->post_title.'</a>');
+        }
+   	  $source = urlencode('Posterize');
+   	  $sourceLink = urlencode('http://statikpulse.com/posterize');
+
+
+        $ch = curl_init(); 
+        curl_setopt($ch, CURLOPT_URL, 'http://posterous.com/api/newpost?source='.$source.'&sourceLink='.$sourceLink.'&site_id='.$this->options['site_id'].'&title='.$title.'&body='.$body.'&tags='.implode(',', $tags)); 
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
+        curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC); 
+        curl_setopt($ch, CURLOPT_USERPWD, "".$this->options['email'].":".$this->options['password']."") ;
+
+        $data = curl_exec($ch); 
+        curl_close($ch);
+     }
+   }
 }
 
 $posterize = new Posterize();
