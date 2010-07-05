@@ -43,7 +43,8 @@ class Posterize {
 		//add default options
 		$default = array(
 					'email' => '',
-					'password' => ''
+					'password' => '',
+					'post_type' => 1
 					);
 					
 		if(!is_array($this->options)) {
@@ -79,6 +80,7 @@ class Posterize {
 			
 			$this->options['email'] = $_POST['email'];
 			$this->options['password'] = $_POST['password'];
+			$this->options["post_type"] = $_POST['post_type'];
 		
 			update_option('posterize', serialize($this->options));
 			
@@ -92,17 +94,26 @@ class Posterize {
           <h2>Posterous Login Info</h2>
           <p>
             <label for="email">Posterous Email</label><br />
-            <input type="text" name="email" id="email" value="<?php echo $this->options['email']; ?>">
+            <input type="text" name="email" id="email" value="<?php echo $this->options['email']; ?>" class="text-field" tabindex="1">
             <span>The email address you use when login into the <a href="https://posterous.com/main/login">Posterous site</a> .</span>
           </p>
           <p>
             <label for="password">Posterous Password</label><br />
-            <input type="password" name="password" id="password" value="<?php echo $this->options['password'] ?>">
+            <input type="password" name="password" id="password" value="<?php echo $this->options['password'] ?>" class="text-field" tabindex="2">
             <span>The password you use when login into the <a href="https://posterous.com/main/login">Posterous site</a>.</span>
           </p>
         </div>
-  
-        <input type="submit" value="<?php _e('Save Settings') ?>" />
+        
+        <div class="section">
+          <h2>Extras</h2>
+          <p>
+            <label for="post_type">Post Type</label><br />
+            <input type="radio" name="post_type" id="post_type" value="1" tabindex="3" <?php if($this->options['post_type'] == "1") { ?>selected="selected"<?php }?>> Link back to post<br />
+            <input type="radio" name="post_type" id="post_type" value="2" tabindex="4" <?php if($this->options['post_type'] == "2") { ?>selected="selected"<?php }?>> Post Full Content<br />
+            <span>Select if you would rather post the full blog content or a link back to your post.</span>
+          </p>
+        </div>
+        <input type="submit" value="<?php _e('Save Settings') ?>" tabindex="5" />
       </form>
     <?php
   }

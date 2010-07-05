@@ -24,7 +24,7 @@
   font-weight: bold;
 }
 
-.section > p input {
+.section > p .text-field {
   font-size: 1.2em;
   padding: 5px;
   width: 275px;
