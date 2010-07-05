@@ -85,7 +85,7 @@ class Posterize {
 			echo '<div id="message" class="updated fade"><p><strong>' . __('Options saved.', 'posterize') . '</strong></p></div>';
 		}
     ?>
-      <form method="post" action="http://macbook.dev/wp-admin/options-general.php?page=posterize-settings" id="posterize_settings_form" name="posterize_settings_form">      
+      <form method="post" action="/wp-admin/options-general.php?page=posterize-settings" id="posterize_settings_form" name="posterize_settings_form">      
         <?php wp_nonce_field('update-options'); ?>
         <h1>Posterize Settings</h1>
         <div class="section">
@@ -93,12 +93,15 @@ class Posterize {
           <p>
             <label for="email">Posterous Email</label><br />
             <input type="text" name="email" id="email" value="<?php echo $this->options['email']; ?>">
+            <span>The email address you use when login into the <a href="https://posterous.com/main/login">Posterous site</a> .</span>
           </p>
           <p>
             <label for="password">Posterous Password</label><br />
             <input type="password" name="password" id="password" value="<?php echo $this->options['password'] ?>">
+            <span>The password you use when login into the <a href="https://posterous.com/main/login">Posterous site</a>.</span>
           </p>
         </div>
+  
         <input type="submit" value="<?php _e('Save Settings') ?>" />
       </form>
     <?php
