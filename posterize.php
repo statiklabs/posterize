@@ -238,12 +238,11 @@ class Posterize {
 	}else{
 		$body = '<a href="'.get_permalink($post_ID).'">'.$post->post_title.'</a>';
 	}
-	die(var_dump($post->post_content));
 	
-	$api = new PosterousAPI('yan@statikpulse.com', 'th3f0rc3');
+	$api = new PosterousAPI($this->options["email"], $this->options["password"]);
 
 	try {
-		$xml = $api->newpost( array( 'site_id' => $this->options['site_id'], 'title' => $post->post_title, 'body' => $post->content, 'tags' => implode(',', $tags), 'source' => 'Posterize', 'sourceLink' => 'http://statikpulse.com/posterize' ) );
+		$xml = $api->newpost( array( 'site_id' => $this->options['site_id'], 'title' => $post->post_title, 'body' => $$body, 'tags' => implode(',', $tags), 'source' => 'Posterize', 'sourceLink' => 'http://statikpulse.com/posterize' ) );
 	}
 	catch(Exception $e) {
 		print $e->getMessage();
