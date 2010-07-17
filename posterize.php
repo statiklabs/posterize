@@ -24,17 +24,23 @@ Author URI: http://statikpulse.com
     along with this program; if not, write to the Free Software
     Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+require('posterous-api.php');
 
 class Posterize {
+    
+	// version
+	var $version;
+	var $options = array();
 
 	function __construct() {
       $this->options = get_option('posterize');
-      (!is_array($this->options) && !empty($this->options)) ? $this->options = unserialize($this->options) : $this->options = false;
+      if(!is_array($this->options) && !empty($this->options)){$this->options = false;}
 
-      register_activation_hook(__FILE__, array(&$this, 'install'));	
-      
+      register_activation_hook(__FILE__, array(&$this, 'install'));
+  		register_deactivation_hook(__FILE__, array(&$this, 'uninstall'));
+            
       add_action('draft_to_publish', array(&$this, 'send'));
-      add_action('pending_to_publish', array(&$this, 'send'));	
+      add_action('pending_to_publish', array(&$this, 'send')); 
     
     if(is_admin()){
       wp_enqueue_style('style', WP_PLUGIN_URL . '/posterize/css/styles.css');
@@ -48,13 +54,27 @@ class Posterize {
   }
   
   function install() {
-		//add default options
 		$default = array(
 					'email' => '',
 					'password' => '',
-					'post_type' => 1
+					'post_type' => 1, 
+					'site_id' => 0,
+					'sites' => array()
 					);
 					
+		if(get_option('posterous_email')){ 
+      delete_option('posterous_email');
+    }
+		if(get_option('posterous_password')){ 
+      delete_option('posterous_password');
+    }
+		if(get_option('post_type')){ 
+      delete_option('post_type');
+    }
+    if(get_option('posterous_site')){ 
+      delete_option('posterous_site');
+    }
+	
 		if(!is_array($this->options)) {
 			$this->options = array();
 		}
@@ -65,10 +85,16 @@ class Posterize {
 			}
 		}
 		
-		update_option('posterize', serialize($this->options));
+		update_option('posterize', $this->options);
 		
 		return true;
 	}
+	
+	function uninstall() {
+    delete_option('posterize');
+		return true;	
+	}
+
 	
   function links($links, $file){
      if( $file == 'posterize/posterize.php') {
@@ -89,12 +115,14 @@ class Posterize {
 			$this->options['email'] = $_POST['email'];
 			$this->options['password'] = $_POST['password'];
 			$this->options["post_type"] = $_POST['post_type'];
+			$this->options["site_id"] = $_POST['site_id'];
 		
-			update_option('posterize', serialize($this->options));
+			update_option('posterize', $this->options);
 			
 			echo '<div id="message" class="updated fade"><p><strong>' . __('Options saved.', 'posterize') . '</strong></p></div>';
 		}
     ?>
+    
       <form method="post" action="/wp-admin/options-general.php?page=posterize-settings" id="posterize_settings_form" name="posterize_settings_form">      
         <?php wp_nonce_field('update-options'); ?>
         <h1>Posterize Settings</h1>
@@ -103,7 +131,7 @@ class Posterize {
           <div>
              <div class="fl">
                <label for="email">Posterous Email</label><br />
-               <input type="text" name="email" id="email" value="<?php echo $this->options['email']; ?>" class="text-field" tabindex="1">
+               <input type="text" name="email" id="email" value="<?php if ( isset( $this->options['email'] ) ) { echo $this->options['email']; } ?>" class="text-field" tabindex="1">
             </div>
             <div class="fr desc">The email address you use when login into the <a href="https://posterous.com/main/login">Posterous site</a> .</div>
             <div class="clear"></div>
@@ -111,7 +139,7 @@ class Posterize {
           <div>
              <div class="fl">
                <label for="password">Posterous Password</label><br />
-               <input type="password" name="password" id="password" value="<?php echo $this->options['password'] ?>" class="text-field" tabindex="2">
+               <input type="password" name="password" id="password" value="<?php if ( isset( $this->options['password'] ) ) { echo $this->options['password']; } ?>" class="text-field" tabindex="2">
             </div>
             <div class="fr desc">The password you use when login into the <a href="https://posterous.com/main/login">Posterous site</a>.</div>
             <div class="clear"></div>
@@ -119,11 +147,20 @@ class Posterize {
         </div>
         <div class="section">
           <h2>Posterous Site Info <a href="/wp-admin/admin-ajax.php?action=get_sites" class="get-sites-link">Refresh Site List</a></h2>
-          <div class="site-info">
-             <?php if(!is_array($this->options['sites']) && !empty($this->options['sites'])){?>
-             <?php }else{ ?>
-                <h4> <a href="/wp-admin/admin-ajax.php?action=get_sites" class="get-sites-link">Click here</a> to see list of your Posterous Sites.</h4>
-            <?php }?>
+          <div>
+             <div class="fl site-info">
+	             <?php if(is_array($this->options['sites']) && !empty($this->options['sites'])){
+	               foreach($this->options["sites"] as $site) {
+	                ?>
+	                <input type="radio" name="site_id" value="<?php echo $site["id"]; ?>" <?php if($this->options["site_id"] == $site["id"]){ ?>checked="true"<?php }?>> <?php echo $site["name"]; ?><br />
+	                <?php } ?>
+	             <?php }else{ ?>
+	                <h4> <a href="/wp-admin/admin-ajax.php?action=get_sites" class="get-sites-link">Click here</a> to see list of your Posterous Sites.</h4>
+	                <?php print_r($this->options['sites']);?>
+	            <?php }?>
+            </div>
+            <div class="fr desc">Select the Posterous site you would like to post to.</div>
+            <div class="clear"></div>
           </div>
         </div>        
         <div class="section">
@@ -151,60 +188,72 @@ class Posterize {
   function getSites() {
      global $userdata;
 
-     $ch = curl_init(); 
-     curl_setopt($ch, CURLOPT_URL, 'http://posterous.com/api/getsites'); 
-     curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
-     curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC); 
-     curl_setopt($ch, CURLOPT_USERPWD, "".$_POST['email'].":".$_POST['password']."") ;
+     $api = new PosterousAPI($_POST['email'], $_POST['password']);
+     header('Content-type: text/html');
 
-     $xml = curl_exec($ch); 
-     curl_close($ch);
+     try {
+     	$xml = $api->getsites();
+     }
+     catch(Exception $e) {
+       print $e->getMessage();
+       die;
+     }
+     
+     $this->options["sites"] = array();
+     $html = array();
+     foreach($xml->{'site'} as $site) {
+         array_push($this->options["sites"], array(
+             "id" => trim($site->id), 
+             "name" => trim($site->name),
+             "url" => trim($site->url), 
+             "hostname" => trim($site->hostname), 
+             "private" => trim($site->private),
+             "primary" => trim($site->primary),
+             "commentsenabled" => trim($site->commentsenabled)
+            )
+        );
+        $html[] = '<input type="radio" name="site_id" value="' . trim($site->id) . '" '. ($site->id == $this->options["site_id"] ? 'checked="true"' : '') .'> ' . trim($site->name) . '<br />';
+      }
 
-     $xml = simplexml_load_string($xml);
-     $data = get_object_vars($root);
-
-     $sites = array();
-
-
-     echo var_dump($xml);;
-     die();
+     
+    update_option('posterize', $this->options);
+    echo implode($html);
+    die();
   }
   
   function send() {
-     if($this->options['email']!='' && $this->options['password']){
-        global $userdata;
-        get_currentuserinfo();
+	global $userdata;
+	get_currentuserinfo();
 
-        $post = get_post($post_ID);
-        $title = urlencode($post->post_title);
-   	  $tags = array();
-   	  $posttags = get_the_tags($post_ID);
-   	  if ($posttags) {
-   		foreach($posttags as $tag) {
-   			$tags[] = $tag->name; 
-   		}
-   	  }
-        if($this->options['post_type']=="2"){
-           $body = urlencode(nl2br($post->post_content));
-        }else{
-           $body = urlencode('<a href="'.get_permalink($post_ID).'">'.$post->post_title.'</a>');
-        }
-   	  $source = urlencode('Posterize');
-   	  $sourceLink = urlencode('http://statikpulse.com/posterize');
+	$post = get_post($post_ID);
+	$tags = array();
+	$posttags = get_the_tags($post_ID);
+	if ($posttags) {
+		foreach($posttags as $tag) {
+			$tags[] = $tag->name; 
+		}
+	}
+	if($this->options['post_type']=="2"){
+		$body = nl2br($post->post_content);
+	}else{
+		$body = '<a href="'.get_permalink($post_ID).'">'.$post->post_title.'</a>';
+	}
+	die(var_dump($post->post_content));
+	
+	$api = new PosterousAPI('yan@statikpulse.com', 'th3f0rc3');
 
+	try {
+		$xml = $api->newpost( array( 'site_id' => $this->options['site_id'], 'title' => $post->post_title, 'body' => $post->content, 'tags' => implode(',', $tags), 'source' => 'Posterize', 'sourceLink' => 'http://statikpulse.com/posterize' ) );
+	}
+	catch(Exception $e) {
+		print $e->getMessage();
+		die;
+	}
 
-        $ch = curl_init(); 
-        curl_setopt($ch, CURLOPT_URL, 'http://posterous.com/api/newpost?source='.$source.'&sourceLink='.$sourceLink.'&site_id='.$this->options['site_id'].'&title='.$title.'&body='.$body.'&tags='.implode(',', $tags)); 
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1); 
-        curl_setopt($ch, CURLOPT_HTTPAUTH, CURLAUTH_BASIC); 
-        curl_setopt($ch, CURLOPT_USERPWD, "".$this->options['email'].":".$this->options['password']."") ;
-
-        $data = curl_exec($ch); 
-        curl_close($ch);
-     }
-   }
+  }
 }
 
 $posterize = new Posterize();
+
 
 ?>

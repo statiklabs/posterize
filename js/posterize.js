@@ -1,5 +1,6 @@
 jQuery(document).ready(function(){
   jQuery('a.get-sites-link').click(function(){
+	jQuery('.site-info').html('<img src="images/loading.gif" />');
     jQuery.ajax({
       url: jQuery(this).attr('href'),
       type: 'POST', 
