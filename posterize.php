@@ -39,18 +39,16 @@ class Posterize {
       register_activation_hook(__FILE__, array(&$this, 'install'));
   		register_deactivation_hook(__FILE__, array(&$this, 'uninstall'));
             
-      add_action('draft_to_publish', array(&$this, 'send'));
-      add_action('pending_to_publish', array(&$this, 'send')); 
+		add_action('publish_post', array(&$this, 'send'));
     
-    if(is_admin()){
-      wp_enqueue_style('style', WP_PLUGIN_URL . '/posterize/css/styles.css');
-  		wp_enqueue_script("jquery"); 
-  		wp_enqueue_script('javascript', WP_PLUGIN_URL . '/posterize/js/posterize.js');
-      add_action('admin_menu', array(&$this, 'adminMenu'));
-      add_filter('plugin_row_meta', array(&$this, 'links'),10,2);
-      add_action( 'wp_ajax_get_sites', array(&$this, 'getSites' ));
-		
-    }
+		if(is_admin()){
+			wp_enqueue_style('style', WP_PLUGIN_URL . '/posterize/css/styles.css');
+			wp_enqueue_script("jquery"); 
+			wp_enqueue_script('javascript', WP_PLUGIN_URL . '/posterize/js/posterize.js');
+			add_action('admin_menu', array(&$this, 'adminMenu'));
+			add_filter('plugin_row_meta', array(&$this, 'links'),10,2);
+			add_action( 'wp_ajax_get_sites', array(&$this, 'getSites' ));
+		}
   }
   
   function install() {
@@ -59,7 +57,8 @@ class Posterize {
 					'password' => '',
 					'post_type' => 1, 
 					'site_id' => 0,
-					'sites' => array()
+					'sites' => array(),
+					'posts' => array()
 					);
 					
 		if(get_option('posterous_email')){ 
@@ -91,7 +90,7 @@ class Posterize {
 	}
 	
 	function uninstall() {
-    delete_option('posterize');
+    	// delete_option('posterize');
 		return true;	
 	}
 
@@ -180,8 +179,9 @@ class Posterize {
             <div class="clear"></div>
           </div>
         </div>
-        <input type="submit" value="<?php _e('Save Settings') ?>" tabindex="5" />
+        <input type="submit" value="<?php _e('Save Settings') ?>" tabindex="5" class="button-secondary action" />
       </form>
+
     <?php
   }
   
@@ -221,7 +221,7 @@ class Posterize {
     die();
   }
   
-  function send() {
+  function send($post_ID) {
 	global $userdata;
 	get_currentuserinfo();
 
@@ -240,9 +240,16 @@ class Posterize {
 	}
 	
 	$api = new PosterousAPI($this->options["email"], $this->options["password"]);
-
+	
 	try {
-		$xml = $api->newpost( array( 'site_id' => $this->options['site_id'], 'title' => $post->post_title, 'body' => $$body, 'tags' => implode(',', $tags), 'source' => 'Posterize', 'sourceLink' => 'http://statikpulse.com/posterize' ) );
+		if(array_key_exists($post->ID, $this->options['posts'])) {
+			$xml = $api->updatepost( array( 'post_id' => $this->options['posts'][$post->ID]['id'], 'title' => $post->post_title, 'body' => $body ) );
+		} else {
+			$xml = $api->newpost( array( 'site_id' => $this->options['site_id'], 'title' => $post->post_title, 'body' => $body, 'tags' => implode(',', $tags), 'source' => 'Posterize', 'sourceLink' => 'http://statikpulse.com/posterize' ) );
+	      $this->options["posts"][$post->ID] = array("id" => trim($xml->{'post'}->id), "url" => trim($xml->{'post'}->url));
+	    	update_option('posterize', $this->options);
+		}
+
 	}
 	catch(Exception $e) {
 		print $e->getMessage();
