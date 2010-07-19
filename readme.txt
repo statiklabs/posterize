@@ -31,6 +31,7 @@ Posterize will cross-post your Wordpress blog post to any of your Posterous site
 = 2.2 =
 * Complete plugin rewrite.. again.
 * Updating a published WordPress post will now update the Posterous post
+* Pages no longer being published (Feature coming soon)
 * Improved admin panel layout and design
 * Selection of Posterous site changed to radio buttons
 
