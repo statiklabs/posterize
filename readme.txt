@@ -2,14 +2,14 @@
 Contributors: Yan Sarazin
 Tags: posterous, email, posts
 Requires at least: 2.8.6
-Tested up to: 3.0
-Stable tag: 2.2
+Tested up to: 2.9.2
+Stable tag: 2.1.1
 
 WordPress to Posterous plugin.
 
 == Description ==
 
-Posterize will cross-post your Wordpress blog post to any of your Posterous sites. Post methods include a link back to your WordPress blog, or complete content. Posterous
+Posterize will cross-post your Wordpress blog post to a Posterous site. You can choose whether to link back your Wordpress blog post or cross-post the full content. Also allows you to select which Posterous site to post to.
 
 
 == Installation ==
@@ -22,18 +22,10 @@ Posterize will cross-post your Wordpress blog post to any of your Posterous site
 == Configuration == 
 
 1. Enter your Posterous email and password (used to log into http://posterous.com)
-2. Click "Refresh site list" and select the Posterous site you want to publish to
-3. Select Post Type
-4. Save Settings
+2. Fill in site id by clicking on "Get Sites"
+3. Chose "Link back to post" or "Post full content"
 
 == Changelog ==
-
-= 2.2 =
-* Complete plugin rewrite.. again.
-* Updating a published WordPress post will now update the Posterous post
-* Pages no longer being published (Feature coming soon)
-* Improved admin panel layout and design
-* Selection of Posterous site changed to radio buttons
 
 = 2.1.1 =
 * Fixed missing line break issues.
