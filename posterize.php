@@ -122,7 +122,7 @@ class Posterize {
       }
       ?>
 
-      <form method="post" action="/wp-admin/options-general.php?page=posterize-settings" id="posterize_settings_form" name="posterize_settings_form">      
+      <form method="post" action="<?php echo get_bloginfo('siteurl'); ?>/wp-admin/options-general.php?page=posterize-settings" id="posterize_settings_form" name="posterize_settings_form">      
       <?php wp_nonce_field('update-options'); ?>
       <h1>Posterize Settings</h1>
       <div class="section">
@@ -145,7 +145,7 @@ class Posterize {
          </div>
       </div>
       <div class="section">
-         <h2>Posterous Site Info <a href="/wp-admin/admin-ajax.php?action=get_sites" class="get-sites-link">Refresh Site List</a></h2>
+         <h2>Posterous Site Info <a href="<?php echo get_bloginfo('siteurl'); ?>/wp-admin/admin-ajax.php?action=get_sites" class="get-sites-link">Refresh Site List</a></h2>
          <div>
             <div class="fl site-info">
          <?php if(is_array($this->options['sites']) && !empty($this->options['sites'])){
@@ -154,7 +154,7 @@ class Posterize {
                <input type="radio" name="site_id" value="<?php echo $site["id"]; ?>" <?php if($this->options["site_id"] == $site["id"]){ ?>checked="true"<?php }?>> <?php echo $site["name"]; ?><br />
             <?php } ?>
             <?php }else{ ?>
-               <h4> <a href="/wp-admin/admin-ajax.php?action=get_sites" class="get-sites-link">Click here</a> to see list of your Posterous Sites.</h4>
+               <h4> <a href="<?php echo get_bloginfo('siteurl'); ?>/wp-admin/admin-ajax.php?action=get_sites" class="get-sites-link">Click here</a> to see list of your Posterous Sites.</h4>
                   <?php print_r($this->options['sites']);?>
                <?php }?>
             </div>
