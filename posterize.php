@@ -183,6 +183,7 @@ class Posterize {
    </form>
 
       <?php
+      echo phpinfo();
 }
 
 function getSites() {
