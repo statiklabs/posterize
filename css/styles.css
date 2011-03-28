@@ -48,6 +48,9 @@ div.desc > ol li {
   margin: 0 0 0 10px;
   color: #666;
 }
+div.desc > span {
+  color: #666;
+}
 div.clear {
   clear: both;
 }

@@ -1,8 +1,8 @@
 === Posterize ===
 Contributors: Yan Sarazin
-Tags: posterous, email, posts
+Tags: posterous, email, posts, cross post, cross posting, auto post, auto posting
 Requires at least: 2.8.6
-Tested up to: 3.0
+Tested up to: 3.1
 Stable tag: 2.2
 
 WordPress to Posterous plugin.
@@ -34,6 +34,7 @@ Posterize will cross-post your Wordpress blog post to any of your Posterous site
 * Pages no longer being published (Feature coming soon)
 * Improved admin panel layout and design
 * Selection of Posterous site changed to radio buttons
+* Specify categories to exclude from cross posting
 
 = 2.1.1 =
 * Fixed missing line break issues.
