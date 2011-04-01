@@ -3,7 +3,7 @@ Contributors: Yan Sarazin
 Tags: posterous, email, posts, cross post, cross posting, auto post, auto posting
 Requires at least: 2.8.6
 Tested up to: 3.1
-Stable tag: 2.2
+Stable tag: 2.1.1
 
 WordPress to Posterous plugin.
 
